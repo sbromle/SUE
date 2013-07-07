@@ -38,17 +38,15 @@ var assertFileExists = function(infile) {
     return instr;
 };
 
+/* Doesn't really do a check. */
 var assertURLExists = function(inurl) {
     var instr = inurl.toString();
-		/*
-    if(!fs.existsSync(instr)) {
-        console.log("%s does not exist. Exiting.", instr);
-        process.exit(1); // http://nodejs.org/api/process.html#process_process_exit_code
-    }
-		*/
     return instr;
 };
 
+/* helper routine to convert JSON to a string and log
+ * it to console.
+ */
 var printJson = function (checkJson) {
  	var outJson = JSON.stringify(checkJson, null, 4);
  	console.log(outJson);
@@ -82,14 +80,14 @@ var cheerioFile = function(htmlfile,checksfile,callback) {
  * call back on the results.
  */
 var cheerioUrl = function(URL,checksfile,callback) {
-	var res = restler.get(URL);
-	res.on('complete',function(result) {
-		if (result instanceof Error) {
-			sys.put('Error: ' + result.message);
-		} else {
-      cheerioLoadAndCheck(result,checksfile,callback);
-		}
-	});
+	restler.get(URL).on('complete',
+      function(result) {
+		    if (result instanceof Error) {
+			    sys.put('Error: ' + result.message);
+		    } else {
+          cheerioLoadAndCheck(result,checksfile,callback);
+		    }
+	    });
 	return;
 };
 
@@ -118,15 +116,6 @@ var clone = function(fn) {
     // Workaround for commander.js issue.
     // http://stackoverflow.com/a/6772648
     return fn.bind({});
-};
-
-/* Takes the following arguments:
- * source -> the filename or the URL of the data source;
- * getdataFn -> A (possibly asynchonous) function that gets data then calls callbackFn
- * callbackFn -> function called after data is sourced.
- */
-var checkSourceAndPrint = function(source,getdataFn,callbackFn) {
-	return getdataFn(source,callbackFn);
 };
 
 if(require.main == module) {
